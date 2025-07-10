@@ -331,3 +331,66 @@ Adopting a scaffolding approach provides several powerful advantages that go bey
   * **Simplified Onboarding:** New team members can get up to speed in record time. By generating a working, best-practices agent, they have an immediate, interactive learning tool to explore the project's architecture.
 
 By building a tool to solve your own repetitive problems, you create a lasting asset that pays dividends in speed, quality, and innovation on every subsequent project.
+
+-----
+
+# APPENDIX
+
+
+### 1\. Prompt to Generate Only the Agent Definition
+
+This prompt focuses on creating the agent itself but excludes the runnable example at the end. This is useful if you want to import this agent definition into another part of a larger application.
+
+**Sample Prompt:**
+
+```python
+generate_code_from_prompt("Just give me the agent definition code.")
+```
+
+**What it does:**
+The keyword `"agent"` triggers the second `elif` block in the plan. The generated script will include:
+
+  * `imports`
+  * `env_loader`
+  * `llm` and `embedding_model` initialization
+  * `mongo_client` connection
+  * `checkpointer` and `store` for memory
+  * `tools`
+  * The `agent` creation itself
+
+It will **not** include the `agent_invocation` block, so the script defines the agent but doesn't run it.
+
+-----
+
+### 2\. Prompt for a Basic LLM Setup
+
+This is the most fundamental request. It's perfect if you just need to start a script that connects to the language model and nothing else.
+
+**Sample Prompt:**
+
+```python
+generate_code_from_prompt("I just need to instantiate the LLM.")
+```
+
+*(Other similar prompts that would work: "llm please", "basic setup")*
+
+**What it does:**
+Since this prompt doesn't contain "full" or "agent", it falls through to the `else` condition, which is the default, most basic plan. The generated script will only contain:
+
+  * `imports` (a subset would technically be needed, but the plan includes all for simplicity)
+  * `env_loader` for API keys
+  * `llm` initialization
+
+This gives you a barebones script to start interacting with the Azure OpenAI model immediately.
+
+-----
+
+### How these prompts work with the script's logic:
+
+The `get_llm_scaffolding_plan` function in your script uses simple keyword matching to decide which components to include:
+
+1.  If the prompt contains words like `"full"`, `"all"`, or `"everything"`, it builds the **complete, runnable script**.
+2.  If not, it checks if the prompt contains the word `"agent"`. If so, it builds the **agent definition without the runnable example**.
+3.  If neither of the above conditions is met, it defaults to the **most basic LLM setup**.
+
+These simpler prompts allow you to generate only the specific parts of the architecture you need, making the scaffolding tool more flexible.
